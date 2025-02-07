@@ -4,7 +4,7 @@ import json
 import certifi
 from pymongo import MongoClient
 from app.config import Config
-import openai
+from langchain_openai import OpenAIEmbeddings
 import os
 
 class ProfileService:
@@ -14,9 +14,11 @@ class ProfileService:
         self.db = self.client["profiles_db"]
         self.collection = self.db["profiles"]
         
-        # Initialize OpenAI configuration
-        openai.api_key = Config.OPENAI_API_KEY
-        openai.api_base = Config.OPENAI_API_BASE
+        # Initialize LangChain OpenAI embeddings
+        self.embeddings = OpenAIEmbeddings(
+            openai_api_key=Config.OPENAI_API_KEY,
+            model="text-embedding-ada-002"
+        )
 
     def get_user_profile(self, email):
         profile = mongo.db.profiles.find_one({'email': email})
@@ -40,7 +42,7 @@ class ProfileService:
             raise Exception('Search text exceeds 200 words limit')
         
         try:
-            # Get embedding for the search text
+            # Get embedding for the search text using LangChain
             query_embedding = self.get_embedding(search_text)
             
             search_query = [
@@ -66,13 +68,10 @@ class ProfileService:
             raise Exception(f"Error in vector search: {str(e)}")
 
     def get_embedding(self, text):
-        """Generate embedding for a given text using OpenAI API."""
+        """Generate embedding for a given text using LangChain OpenAI embeddings."""
         try:
-            response = openai.Embedding.create(
-                model="text-embedding-ada-002",
-                input=text
-            )
-            return response['data'][0]['embedding']
+            embedding = self.embeddings.embed_query(text)
+            return embedding
         except Exception as e:
             raise Exception(f"Error generating embedding: {str(e)}")
 
