@@ -21,4 +21,4 @@ client = MongoClient(
 db = client.profiles_db
 profiles = db.profiles
 
-from app import routes 
+from app import routes
