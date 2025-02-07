@@ -12,7 +12,4 @@ def handler(request):
             return flask_app.full_dispatch_request()
         except Exception as e:
             flask_app.logger.error(f"Error handling request: {str(e)}")
-            return 'Internal Server Error', 500
-
-# This is required for Vercel serverless functions
-handler = app
+            return 'Internal Server Error', 500 
