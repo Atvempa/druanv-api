@@ -2,6 +2,7 @@ flask==3.0.0
 flask-pymongo==2.3.0
 pymongo[srv]==4.6.1
 python-dotenv==1.0.0
-openai==0.28.0
+langchain-openai==0.1.8
+langchain==0.1.9
 certifi==2024.2.2
 flask-cors==4.0.0
