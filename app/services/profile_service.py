@@ -4,7 +4,8 @@ import json
 import certifi
 from pymongo import MongoClient
 from app.config import Config
-from openai import OpenAI
+import openai
+import os
 
 class ProfileService:
     def __init__(self):
@@ -12,8 +13,10 @@ class ProfileService:
         self.client = MongoClient(Config.MONGO_URI, tlsCAFile=certifi.where())
         self.db = self.client["profiles_db"]
         self.collection = self.db["profiles"]
-        # Initialize OpenAI client
-        self.openai_client = OpenAI(api_key=Config.OPENAI_API_KEY)
+        
+        # Initialize OpenAI configuration
+        openai.api_key = Config.OPENAI_API_KEY
+        openai.api_base = Config.OPENAI_API_BASE
 
     def get_user_profile(self, email):
         profile = mongo.db.profiles.find_one({'email': email})
@@ -65,12 +68,11 @@ class ProfileService:
     def get_embedding(self, text):
         """Generate embedding for a given text using OpenAI API."""
         try:
-            response = self.openai_client.embeddings.create(
+            response = openai.Embedding.create(
                 model="text-embedding-ada-002",
-                input=text,
-                encoding_format="float"
+                input=text
             )
-            return response.data[0].embedding
+            return response['data'][0]['embedding']
         except Exception as e:
             raise Exception(f"Error generating embedding: {str(e)}")
 
