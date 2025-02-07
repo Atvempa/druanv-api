@@ -1,4 +1,4 @@
-from app import app
+from app import app as application
 
 # This is required for Vercel serverless functions
-handler = app 
+app = application
